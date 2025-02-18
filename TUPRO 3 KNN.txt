@@ -1,0 +1,190 @@
+!pip install XlsxWriter
+Collecting XlsxWriter
+  Downloading https://files.pythonhosted.org/packages/2c/ce/74fd8d638a5b82ea0c6f08a5978f741c2655a38c3d6e82f73a0f084377e6/XlsxWriter-1.4.3-py2.py3-none-any.whl (149kB)
+     |████████████████████████████████| 153kB 14.6MB/s 
+Installing collected packages: XlsxWriter
+Successfully installed XlsxWriter-1.4.3
+
+import pandas as pd
+import math
+
+#import copy
+import xlsxwriter
+
+def MinmaxScaling_DataTraining(DataFrame_Training): 
+  ListData_HasilNormalisasi = []
+  for i in range(len(DataFrame_Training)) :
+    ListData_HasilNormalisasi.append([
+       DataFrame_Training.iloc[i]['Nama Mobil'],
+      (DataFrame_Training.iloc[i]['Ukuran'] - DataFrame_Training['Ukuran'].min()) / (DataFrame_Training['Ukuran'].max()-DataFrame_Training['Ukuran'].min()),
+      (DataFrame_Training.iloc[i]["Kenyamanan"] -DataFrame_Training['Kenyamanan'].min()) / (DataFrame_Training['Kenyamanan'].max()-DataFrame_Training['Kenyamanan'].min()),
+      (DataFrame_Training.iloc[i]["Irit"] -DataFrame_Training['Irit'].min()) / (DataFrame_Training['Irit'].max()-DataFrame_Training['Irit'].min()),
+      (DataFrame_Training.iloc[i]["Kecepatan"] -DataFrame_Training['Kecepatan'].min()) / (DataFrame_Training['Kecepatan'].max()-DataFrame_Training['Kecepatan'].min()),
+      (DataFrame_Training.iloc[i]["Harga (Ratus Juta)"] -DataFrame_Training['Harga (Ratus Juta)'].min()) / (DataFrame_Training['Harga (Ratus Juta)'].max()-DataFrame_Training['Harga (Ratus Juta)'].min())
+    ])
+  return ListData_HasilNormalisasi
+def MinMaXScaling_DataTesting(DataFrame_Testing,DataFrame_Training):
+  return [(DataFrame_Testing.iloc[0]['Ukuran'] - DataFrame_Training['Ukuran'].min()) / (DataFrame_Training['Ukuran'].max() - DataFrame_Training['Ukuran'].min()),
+          (DataFrame_Testing.iloc[0]['Kenyamanan'] - DataFrame_Training['Kenyamanan'].min()) / (DataFrame_Training['Kenyamanan'].max() - DataFrame_Training['Kenyamanan'].min()),
+          (DataFrame_Testing.iloc[0]['Irit'] - DataFrame_Training['Irit'].min()) / (DataFrame_Training['Irit'].max() - DataFrame_Training['Irit'].min()),
+          (DataFrame_Testing.iloc[0]['Kecepatan'] - DataFrame_Training['Kecepatan'].min()) / (DataFrame_Training['Kecepatan'].max() - DataFrame_Training['Kecepatan'].min()),
+          (DataFrame_Testing.iloc[0]['Harga (Ratus Juta)'] - DataFrame_Training['Harga (Ratus Juta)'].min()) / (DataFrame_Training['Harga (Ratus Juta)'].max() - DataFrame_Training['Harga (Ratus Juta)'].min())]
+def PerhitunganJarak_EuclideanDistance(DataTraining,InputanUser_DataTesting):
+  DataTrainingCopy = [x[:] for x in DataTraining]
+  for i in range(len(DataTrainingCopy)):
+    Hitungan_Euclidean = (
+                          math.pow(DataTrainingCopy[i][1]-InputanUser_DataTesting[0],2) 
+                        + math.pow(DataTrainingCopy[i][2]-InputanUser_DataTesting[1],2) 
+                        + math.pow(DataTrainingCopy[i][3]-InputanUser_DataTesting[2],2) 
+                        + math.pow(DataTrainingCopy[i][4]-InputanUser_DataTesting[3],2)
+                        + math.pow(DataTrainingCopy[i][5]-InputanUser_DataTesting[4],2)
+    )
+    Hitungan_Euclidean = math.pow(Hitungan_Euclidean,1/2)
+    DataTrainingCopy[i].append(Hitungan_Euclidean)
+    i = i + 1
+  return DataTrainingCopy
+def PerhitunganJarak_ManhattanDistance(DataTraining,InputanUser_DataTesting):
+  DataTrainingCopy = [x[:] for x in DataTraining]
+  for i in range(len(DataTrainingCopy)):
+    Hitungan_Manhattan = (
+                          abs(DataTrainingCopy[i][1]-InputanUser_DataTesting[0]) 
+                        + abs(DataTrainingCopy[i][2]-InputanUser_DataTesting[1]) 
+                        + abs(DataTrainingCopy[i][3]-InputanUser_DataTesting[2]) 
+                        + abs(DataTrainingCopy[i][4]-InputanUser_DataTesting[3])
+                        + abs(DataTrainingCopy[i][5]-InputanUser_DataTesting[4])
+    )
+    DataTrainingCopy[i].append(Hitungan_Manhattan)
+    i = i + 1
+  return DataTrainingCopy
+def PerhitunganJarak_MinkowskiDistance(DataTraining,InputanUser_DataTesting):
+  DataTrainingCopy = [x[:] for x in DataTraining]
+  for i in range(len(DataTrainingCopy)):
+    Hitungan_Minkowsi = (
+                          math.pow(abs(DataTrainingCopy[i][1]-InputanUser_DataTesting[0]),1.5) 
+                        + math.pow(abs(DataTrainingCopy[i][2]-InputanUser_DataTesting[1]),1.5) 
+                        + math.pow(abs(DataTrainingCopy[i][3]-InputanUser_DataTesting[2]),1.5) 
+                        + math.pow(abs(DataTrainingCopy[i][4]-InputanUser_DataTesting[3]),1.5)
+                        + math.pow(abs(DataTrainingCopy[i][5]-InputanUser_DataTesting[4]),1.5)
+    )
+    Hitungan_Minkowsi = math.pow(Hitungan_Minkowsi,1/1.5)
+    DataTrainingCopy[i].append(Hitungan_Minkowsi)
+    i = i + 1
+  return DataTrainingCopy
+def PerhitunganJarak_SupremumDistance(DataTraining,InputanUser_DataTesting):
+  DataTrainingCopy = [x[:] for x in DataTraining]
+  for i in range(len(DataTrainingCopy)):
+    Hitungan_Supremum = (
+                          abs(DataTrainingCopy[i][1]-InputanUser_DataTesting[0]) 
+                        , abs(DataTrainingCopy[i][2]-InputanUser_DataTesting[1]) 
+                        , abs(DataTrainingCopy[i][3]-InputanUser_DataTesting[2]) 
+                        , abs(DataTrainingCopy[i][4]-InputanUser_DataTesting[3])
+                        , abs(DataTrainingCopy[i][5]-InputanUser_DataTesting[4])
+    )
+    DataTrainingCopy[i].append(max(Hitungan_Supremum))
+    i = i + 1
+  return DataTrainingCopy
+def KlasfikasiKNN(Data_Mobil,Data_EuclideanDistance,Data_ManhattanDistance,Data_MinkowskiDistance,Data_SupremumDistance):
+  Rekomendasi_EuclideanDistance = []
+  Rekomendasi_ManhattanDistance = []
+  Rekomendasi_MinkowskiDistance = []
+  Rekomendasi_SupremumDistance  = []
+  #urutkan terlebih dahulu berdasarkan distancenya.
+  Data_EuclideanDistance = sorted(Data_EuclideanDistance, key=lambda x:x[6])
+  Data_ManhattanDistance = sorted(Data_ManhattanDistance, key=lambda x:x[6])
+  Data_MinkowskiDistance = sorted(Data_MinkowskiDistance, key=lambda x:x[6])
+  Data_SupremumDistance  = sorted(Data_SupremumDistance, key=lambda x:x[6])
+  for i in range(3):
+    Rekomendasi_EuclideanDistance.append(Data_EuclideanDistance[i])
+    Rekomendasi_ManhattanDistance.append(Data_ManhattanDistance[i])
+    Rekomendasi_MinkowskiDistance.append(Data_MinkowskiDistance[i])
+    Rekomendasi_SupremumDistance.append(Data_SupremumDistance[i])
+  return Rekomendasi_EuclideanDistance,Rekomendasi_ManhattanDistance,Rekomendasi_MinkowskiDistance,Rekomendasi_SupremumDistance
+def MenampilkanData_RowNamaMobil(ListData):
+  for i in range(len(ListData)):
+    print(i+1,ListData[i][0],'# Distance :',ListData[i][6])
+def MembuatExcel(ListMobilRekomendasi,NamaExcel):
+  workbook = xlsxwriter.Workbook(NamaExcel)
+  worksheet = workbook.add_worksheet("The Data")
+  worksheet.write(0,0,'Rekomendasi Mobil')
+  start = 1 
+  for i in range(len(ListMobilRekomendasi)):
+      worksheet.write(start,0,ListMobilRekomendasi[i][0])
+      start += 1
+  workbook.close()
+df_training =  pd.read_excel('https://drive.google.com/uc?id=1BQmDJg3-MwBVJAevFIZQDVMnkEcxk40R')
+df_training
+Nama Mobil	Ukuran	Kenyamanan	Irit	Kecepatan	Harga (Ratus Juta)
+0	Toyota Agya	4	4	9	6	1.00
+1	Daihatsu Alya	4	3	9	6	1.10
+2	Toyota Avanza	6	5	6	6	2.00
+3	Daihatsu Xenia	6	4	6	6	1.75
+4	Xpander	7	7	6	7	2.25
+5	Livina	7	7	6	7	2.10
+6	Karimun	3	4	10	5	1.20
+7	Toyota Innova	8	8	5	7	4.00
+8	Alphard	9	10	4	8	10.00
+9	Toyota Vios	5	7	9	8	2.50
+10	Honda City	5	8	7	8	2.70
+11	Toyota Hiace	10	5	8	6	5.00
+12	Toyota Fortuner	9	8	5	8	5.00
+13	Toyota Foxy	9	9	5	7	5.50
+14	Toyota Corolla Altis	5	9	7	9	6.00
+15	Suzuki Ertiga	7	7	7	7	2.30
+16	Suzuki Carry	7	3	9	5	0.80
+df_testing =  pd.read_excel('https://drive.google.com/uc?id=10RzOyZgXWXXwT0kOVcGnq6aaYs-JK6CZ')
+df_testing
+Ukuran	Kenyamanan	Irit	Kecepatan	Harga (Ratus Juta)
+0	9	9	4	8	9
+DataTesting_InputanUser = MinMaXScaling_DataTesting(df_testing,df_training)
+
+ListData_Mobil = MinmaxScaling_DataTraining(df_training)
+
+ListData_EuclideanDistance = PerhitunganJarak_EuclideanDistance(ListData_Mobil,DataTesting_InputanUser)
+ListData_ManhattanDistance = PerhitunganJarak_ManhattanDistance(ListData_Mobil,DataTesting_InputanUser)
+ListData_MinkowskiDistance = PerhitunganJarak_MinkowskiDistance(ListData_Mobil,DataTesting_InputanUser)
+ListData_SupremumDistance  = PerhitunganJarak_SupremumDistance(ListData_Mobil,DataTesting_InputanUser)
+
+#Mencari Rekomendasi atau Jarak Terdekat dari masing - masing perhitungan jarak
+ListRekomendasi_EuclideanDistance,ListRekomendasi_ManhattanDistance,ListRekomendasi_MinkowskiDistance,ListRekomendasi_SupremumDistance = KlasfikasiKNN(ListData_Mobil,ListData_EuclideanDistance,ListData_ManhattanDistance,ListData_MinkowskiDistance,ListData_SupremumDistance)
+
+#Tampilkan Rekomendasi
+print('Prosesssss.............................................')
+print('=======================================================')
+print('Menampilkan Rekomendasi Euclidean Distance : ')
+MenampilkanData_RowNamaMobil(ListRekomendasi_EuclideanDistance)
+MembuatExcel(ListRekomendasi_EuclideanDistance,'Hasil Rekomendasi Euclidean.xlsx')
+print('=======================================================')
+print('Menampilkan Rekomendasi Manhattan Distance : ')
+MenampilkanData_RowNamaMobil(ListRekomendasi_ManhattanDistance)
+MembuatExcel(ListRekomendasi_ManhattanDistance,'Hasil Rekomendasi Manhattan.xlsx')
+print('=======================================================')
+print('Menampilkan Rekomendasi Minkowski Distance : ')
+MenampilkanData_RowNamaMobil(ListRekomendasi_MinkowskiDistance)
+MembuatExcel(ListRekomendasi_MinkowskiDistance,'Hasil Rekomendasi Minkowski.xlsx')
+print('=======================================================')
+print('Menampilkan Rekomendasi Supremum Distance  : ')
+MenampilkanData_RowNamaMobil(ListRekomendasi_SupremumDistance)
+MembuatExcel(ListRekomendasi_SupremumDistance,'Hasil Rekomendasi Supremum.xlsx')
+print('=======================================================')
+Prosesssss.............................................
+=======================================================
+Menampilkan Rekomendasi Euclidean Distance : 
+1 Alphard # Distance : 0.1795074039331482
+2 Toyota Foxy # Distance : 0.48477665124911207
+3 Toyota Fortuner # Distance : 0.48705426583418854
+=======================================================
+Menampilkan Rekomendasi Manhattan Distance : 
+1 Alphard # Distance : 0.251552795031056
+2 Toyota Fortuner # Distance : 0.7443064182194615
+3 Toyota Foxy # Distance : 0.7971014492753622
+=======================================================
+Menampilkan Rekomendasi Minkowski Distance : 
+1 Alphard # Distance : 0.20057812908574302
+2 Toyota Fortuner # Distance : 0.5507481542383833
+3 Toyota Foxy # Distance : 0.5676581978592439
+=======================================================
+Menampilkan Rekomendasi Supremum Distance  : 
+1 Alphard # Distance : 0.1428571428571429
+2 Toyota Foxy # Distance : 0.38043478260869557
+3 Toyota Fortuner # Distance : 0.4347826086956521
+=======================================================
