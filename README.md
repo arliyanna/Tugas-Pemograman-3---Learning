@@ -1,6 +1,8 @@
 # Tugas-Pemograman-3---Learning
 
-1. Task Description
+**1. Task Description**
+
+
    Given a traintest.xlsx file consisting of two sheets: train and test, which contains the dataset for the binary classification problem. Each record or row of data in the dataset consists of generally consists of data row number (𝑖𝑑), input features (𝑥1 to 𝑥3), and output class (𝑦). Features consists of integer values in a certain range for each feature. While the output class is binary (0 or 1).
    ![image](https://github.com/user-attachments/assets/bcdeac4d-40ab-4768-b22d-02080d6b1112)
    
